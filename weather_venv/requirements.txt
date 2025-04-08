@@ -4,3 +4,4 @@ google-cloud-bigquery==3.31.0
 pandas-gbq==0.28.0
 matplotlib==3.9.4
 seaborn==0.13.2
+path

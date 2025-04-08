@@ -1,8 +1,13 @@
-# pylint: disable=broad-exception-caught,invalid-name
+# import libraries
 
+import os
 import time
 import datetime
 import base64
+import sys
+import path
+from pathlib import Path
+
 import streamlit as st
 import pandas_gbq
 import matplotlib.pyplot as plt
@@ -31,8 +36,12 @@ st.markdown("- When a storm/hurricane is coming, what is the estimated impact, w
 st.markdown('- What are the oppotunities it could bring?')
 
 
-
 st.subheader('Beryl 2024 Houston - WeatherNext Forecast')
+
+
+
+dir = Path(__file__).resolve()
+sys.path.append(dir.parent)
 
 # Insert gif from local
 gif_file = open('Beryl.gif', 'rb')
@@ -72,40 +81,16 @@ SELECT
 """
 
 
-df_Hou_T_W = pandas_gbq.read_gbq(query, credentials=credentials)
+df_Hou_T_W_P = pandas_gbq.read_gbq(query, credentials=credentials)
 
 # results = client.query(query)
 
 # Show Houston Temp in dataframe
 st.write("Temperature, Wind, Precipitation in Houston:")
-st.dataframe(df_Hou_T_W)
+st.dataframe(df_Hou_T_W_P)
 
 
-# Plot Houston Temp
-# Extract the date from the first forecast_time
-# forecast_date = df_Hou_T['time_CT'].iloc[0].strftime('%Y-%m-%d')
-
-# # Set the aesthetic style of the plots
-# sns.set_theme(style="whitegrid")
-
-# # Plot the data
-# plt.figure(figsize=(10, 6))
-# sns.lineplot(x=mdates.date2num(df_Hou_T['time_CT'].dt.to_pydatetime()), y=df_Hou_T['2m_temperature_F'], marker='o', linestyle='-', color='lightcoral')
-# plt.xlabel('Forecast Time', fontsize=12)
-# plt.ylabel('2m Temperature (F)', fontsize=12)
-# plt.title(f'Temperature Forecast for Houston', fontsize=14)
-
-# # Format the x-axis ticks
-# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))  # Show date and time
-# plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))  # Show ticks for each day
-# plt.xticks(rotation=45, ha='right', fontsize=10)
-
-# plt.tight_layout()
-# # plt.show()
-
-# st.pyplot(plt.gcf())
-
-
+# Plot Houston Temp, Wind speed, Precipitation
 
 # Set the aesthetic style
 sns.set_theme(style="white")
@@ -115,7 +100,7 @@ fig, ax1 = plt.subplots(figsize=(18, 12))
 
 # Wind speed
 color = 'tab:blue'
-sns.lineplot(x='time_CT', y='wind_speed_m_s', data=df_Hou_T_W, marker='o', linestyle='-', color=color, ax=ax1)
+sns.lineplot(x='time_CT', y='wind_speed_m_s', data=df_Hou_T_W_P, marker='o', linestyle='-', color=color, ax=ax1)
 ax1.set_xlabel('Time', fontsize=20)
 ax1.set_ylabel('Wind Speed (m/s)', color=color, fontsize=20)
 ax1.tick_params(axis='x', labelsize=16)
@@ -124,14 +109,14 @@ ax1.tick_params(axis='y', labelcolor=color, labelsize=16)
 # Temperature
 ax2 = ax1.twinx()  # Instantiate a second axes that shares the same x-axis
 color = 'tab:red'
-sns.lineplot(x='time_CT', y='2m_temperature_F', data=df_Hou_T_W, marker='x', linestyle='--', color=color, ax=ax2)
+sns.lineplot(x='time_CT', y='2m_temperature_F', data=df_Hou_T_W_P, marker='x', linestyle='--', color=color, ax=ax2)
 ax2.set_ylabel('Temp (F)', color=color, fontsize=20)
 ax2.tick_params(axis='y', labelcolor=color, labelsize=16)
 
 # Precipitation
 ax3 = ax1.twinx()  # Instantiate a third axes that shares the same x-axis
 color = 'tab:purple'
-sns.lineplot(x='time_CT', y='total_precipitation_6hr_m', data=df_Hou_T_W, marker='*', linestyle='-.', color=color, ax=ax3)
+sns.lineplot(x='time_CT', y='total_precipitation_6hr_m', data=df_Hou_T_W_P, marker='*', linestyle='-.', color=color, ax=ax3)
 ax3.set_ylabel('Precipitation (m)', color=color, fontsize=20, labelpad=10)
 ax3.tick_params(axis='y', labelcolor=color, length=40, labelsize=16)
 
