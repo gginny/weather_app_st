@@ -40,13 +40,8 @@ st.subheader('Beryl 2024 Houston - WeatherNext Forecast')
 
 
 
-# # # dir = Path(__file__).resolve()
-# # # sys.path.append(dir.parent)
-
-
-work_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(work_dir)
-
+dir = Path(__file__).resolve()
+sys.path.append(dir.parent)
 
 # Insert gif from local
 gif_file = open('Beryl_short.gif', 'rb')
@@ -61,9 +56,7 @@ st.markdown(
 
 
 
-# Insert link to Earth Engine
-ee_url = "https://code.earthengine.google.com/7e205778d5c52c0962ba6f235e2887d4"
-st.markdown("View animation on [Google Earth Engine](%s)." % ee_url)
+
 
 
 # Create a date selector widget input
