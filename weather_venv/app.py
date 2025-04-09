@@ -61,6 +61,10 @@ st.markdown(
 
 
 
+# Insert link to Earth Engine
+ee_url = "https://code.earthengine.google.com/7e205778d5c52c0962ba6f235e2887d4"
+st.markdown("View animation on [Google Earth Engine](%s)." % ee_url)
+
 
 # Create a date selector widget input
 date_selector_input = st.date_input('Enter date:', datetime.date(2024, 7, 7)) 
