@@ -40,20 +40,20 @@ st.subheader('Beryl 2024 Houston - WeatherNext Forecast')
 
 
 
-work_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(work_dir)
+# work_dir = os.path.dirname(os.path.abspath(__file__))
+# os.chdir(work_dir)
 
 
-# Insert gif from local
-gif_file = open('Beryl_short.gif', 'rb')
-contents = gif_file.read()
-data_url = base64.b64encode(contents).decode("utf-8")
-gif_file.close()
+# # Insert gif from local
+# gif_file = open('Beryl_short.gif', 'rb')
+# contents = gif_file.read()
+# data_url = base64.b64encode(contents).decode("utf-8")
+# gif_file.close()
 
-st.markdown(
-    f'<img src="data:image/gif;base64,{data_url}" alt="Beryl gif">',
-    unsafe_allow_html=True,
-)
+# st.markdown(
+#     f'<img src="data:image/gif;base64,{data_url}" alt="Beryl gif">',
+#     unsafe_allow_html=True,
+# )
 
 
 
