@@ -68,11 +68,14 @@ date_selector_input = st.date_input('Enter date:', datetime.date(2024, 7, 7))
 # Display the select date widget
 st.write('Date selected:', date_selector_input)
 
+date_selector = date_selector_input.strftime("%Y-%m-%d %H:%M:%S")
 
 # Houston Temp forecast using WeatherNext model
 
+
 query = """
 SELECT
+    t1.init_time as `init_time`,
     DATETIME(t2.time, 'America/Chicago') AS `time_CT`,
     (t2.`2m_temperature` - 273.15) * 9/5 + 32 as `2m_temperature_F`,
     SQRT(POW(t2.`10m_u_component_of_wind`, 2) + POW(t2.`10m_v_component_of_wind`, 2)) AS `wind_speed_m_s`,
@@ -80,18 +83,22 @@ SELECT
   FROM
     `ginny-gcp-demo.weathernext_graph_forecasts.59572747_4_0` AS t1, t1.forecast AS t2
   WHERE ST_INTERSECTS(t1.geography_polygon, ST_GEOGFROMTEXT('POLYGON((-95.2481 29.8767, -95.2810 30.2825, -95.4601 29.7765, -95.2481 29.8767))'))  # Houston    
-   AND t1.init_time = TIMESTAMP('2024-07-05 00:00:00 UTC')
+  AND t1.init_time BETWEEN TIMESTAMP('2024-05-01 00:00:00 UTC') AND TIMESTAMP('2024-07-30 00:00:00 UTC')
   ORDER BY t2.time
 """
 
 
 df_Hou_T_W_P = pandas_gbq.read_gbq(query, credentials=credentials)
+df_Hou_T_W_P_f = df_Hou_T_W_P.loc[df_Hou_T_W_P['init_time'] == date_selector]
 
-# results = client.query(query)
+
+# filter df based on date user selection
+df_Hou_T_W_P_f = df_Hou_T_W_P_f[['time_CT', '2m_temperature_F', 'wind_speed_m_s', 'total_precipitation_6hr_m']]
+
 
 # Show Houston Temp in dataframe
 st.write("Temperature, Wind, Precipitation in Houston:")
-st.dataframe(df_Hou_T_W_P)
+st.dataframe(df_Hou_T_W_P_f)
 
 
 # Plot Houston Temp, Wind speed, Precipitation
@@ -104,7 +111,7 @@ fig, ax1 = plt.subplots(figsize=(18, 12))
 
 # Wind speed
 color = 'tab:blue'
-sns.lineplot(x='time_CT', y='wind_speed_m_s', data=df_Hou_T_W_P, marker='o', linestyle='-', color=color, ax=ax1)
+sns.lineplot(x='time_CT', y='wind_speed_m_s', data=df_Hou_T_W_P_f, marker='o', linestyle='-', color=color, ax=ax1)
 ax1.set_xlabel('Time', fontsize=20)
 ax1.set_ylabel('Wind Speed (m/s)', color=color, fontsize=20)
 ax1.tick_params(axis='x', labelsize=16)
@@ -113,14 +120,14 @@ ax1.tick_params(axis='y', labelcolor=color, labelsize=16)
 # Temperature
 ax2 = ax1.twinx()  # Instantiate a second axes that shares the same x-axis
 color = 'tab:red'
-sns.lineplot(x='time_CT', y='2m_temperature_F', data=df_Hou_T_W_P, marker='x', linestyle='--', color=color, ax=ax2)
+sns.lineplot(x='time_CT', y='2m_temperature_F', data=df_Hou_T_W_P_f, marker='x', linestyle='--', color=color, ax=ax2)
 ax2.set_ylabel('Temp (F)', color=color, fontsize=20)
 ax2.tick_params(axis='y', labelcolor=color, labelsize=16)
 
 # Precipitation
 ax3 = ax1.twinx()  # Instantiate a third axes that shares the same x-axis
 color = 'tab:purple'
-sns.lineplot(x='time_CT', y='total_precipitation_6hr_m', data=df_Hou_T_W_P, marker='*', linestyle='-.', color=color, ax=ax3)
+sns.lineplot(x='time_CT', y='total_precipitation_6hr_m', data=df_Hou_T_W_P_f, marker='*', linestyle='-.', color=color, ax=ax3)
 ax3.set_ylabel('Precipitation (m)', color=color, fontsize=20, labelpad=10)
 ax3.tick_params(axis='y', labelcolor=color, length=40, labelsize=16)
 
